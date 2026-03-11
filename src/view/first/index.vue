@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, reactive, nextTick, unref, next } from 'vue'
+import { ref, computed, onMounted, onUnmounted, reactive, nextTick, unref } from 'vue'
 import { useLocale } from 'element-plus'
 const { t } = useLocale()
 import Mock from 'mockjs'
-import type { TaskItem, PriorityType, StatusType } from '@/type/first'
 import table_v2 from '@/components/table_v2/index.vue'
 import selectionForTable from '@/components/table_v2/components/selection.vue'
 import { h } from 'vue'
@@ -225,60 +224,9 @@ const generateMockData = (count) => {
 
 // --- 响应式数据 ---
 const allData = ref(generateMockData(1000)) // 生成1000条测试数据
-const searchKeyword = ref('')
-const checkedIds = ref([])
-const allChecked = ref(false)
 const tableContainer = ref(null)
 const scrollTop = ref(0)
-const itemHeight = 56 // 每行高度固定为56px
 
-// --- 计算属性 ---
-const filteredData = computed(() => {
-    if (!searchKeyword.value) return allData.value
-    return allData.value.filter(item =>
-        item.name.includes(searchKeyword.value) || item.owner.includes(searchKeyword.value)
-    )
-})
-
-const totalCount = computed(() => filteredData.value.length)
-
-const visibleData = computed(() => {
-    const containerHeight = tableContainer.value?.clientHeight || 500
-    const start = Math.floor(scrollTop.value / itemHeight)
-    const end = start + Math.ceil(containerHeight / itemHeight) + 2 // 多渲染2行防止白屏
-    return filteredData.value.slice(start, end)
-})
-
-// --- 样式映射函数 ---
-const getPriorityType = (priority) => {
-    const typeMap = {
-        P0: 'danger',
-        P1: 'danger',
-        P2: 'warning',
-        P3: 'info',
-        P4: '',
-        null: ''
-    }
-    return typeMap[priority] || ''
-}
-
-const getStatusType = (status) => {
-    const typeMap = {
-        '进行中': 'success',
-        '策划中': '',
-        '待确认': 'warning'
-    }
-    return typeMap[status] || ''
-}
-
-// --- 事件处理 ---
-const handleAllCheck = (val) => {
-    if (val) {
-        checkedIds.value = filteredData.value.map(item => item.id)
-    } else {
-        checkedIds.value = []
-    }
-}
 
 const handleScroll = (e) => {
     const target = e.target as HTMLDivElement
@@ -297,9 +245,6 @@ onUnmounted(() => {
 })
 
 const handleResize = () => {
-    nextTick(() => {
-        flag = !flag
-    })
 }
 
 onMounted(() => {
@@ -349,7 +294,7 @@ onUnmounted(() => {
         padding: 0;
     }
 
-    :deep(.el-table-v2__rowData-cell.tableItems) {
+    :deep(.el-table-v2__row-cell.tableItems) {
         border-left: 1px solid #f2f3f5;
 
         &:last-child {
