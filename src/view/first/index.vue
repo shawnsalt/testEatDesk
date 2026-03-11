@@ -1,22 +1,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, reactive, nextTick, unref, next } from 'vue'
-import type { FunctionalComponent } from 'vue'
-import {
-    Filter,
-    Sort,
-    Grid,
-    Search,
-    Plus,
-    Timer
-} from '@element-plus/icons-vue'
-import { ElCheckbox, ElTag, useLocale } from 'element-plus'
+import { useLocale } from 'element-plus'
 const { t } = useLocale()
 import Mock from 'mockjs'
 import type { TaskItem, PriorityType, StatusType } from '@/type/first'
 import table_v2 from '@/components/table_v2/index.vue'
 import selectionForTable from '@/components/table_v2/components/selection.vue'
 import { h } from 'vue'
-import { log } from 'console'
 import Flow from './components/flow.vue'
 import Priority from './components/priority.vue'
 import Owner from './components/owner.vue'
@@ -341,78 +331,6 @@ onUnmounted(() => {
     flex-direction: column;
     background: #fff;
     padding: 16px;
-}
-
-.toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-}
-
-.left-ops {
-    display: flex;
-    align-items: center;
-}
-
-.table-wrapper {
-    flex: 1;
-    overflow: auto;
-    border: 1px solid #e4e7ed;
-    border-radius: 4px;
-}
-
-.task-table {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
-}
-
-.task-table th,
-.task-table td {
-    padding: 12px 16px;
-    text-align: left;
-    border-bottom: 1px solid #ebeef5;
-    font-size: 14px;
-}
-
-.task-table th {
-    background-color: #f5f7fa;
-    color: #606266;
-    font-weight: 500;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
-
-.virtual-tbody {
-    position: relative;
-    display: block;
-}
-
-.virtual-tbody tr {
-    position: relative;
-    height: 56px;
-    box-sizing: border-box;
-}
-
-.task-name {
-    color: #409eff;
-    cursor: pointer;
-}
-
-.user-cell {
-    display: flex;
-    align-items: center;
-}
-
-.footer {
-    margin-top: 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 12px;
-    color: #909399;
 }
 
 .tableArea {
