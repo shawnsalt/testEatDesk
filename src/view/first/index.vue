@@ -6,23 +6,26 @@ import Mock from 'mockjs'
 import table_v2_tag from '@/components/table_v2/tag.vue'
 import selectionForTable from '@/components/table_v2/components/selection.vue'
 import { h } from 'vue'
-import Owner from './components/owner.vue'
+import ownerVue from './components/owner.vue'
 import scheduleHeader from './components/schedule/header.vue'
 import scheduleContent from './components/schedule/content.vue'
 import { DictItem } from '@/type/utils'
 import { selectByDict } from '@/utils/index.js'
+import { TaskItem } from '@/type/first'
 // 固定列的总宽度
 const fixedColumnsWidth = 50 + 80 + 80 + 80 + 132 + 150 + 150 + 242
 
 const flag = ref(false)
 // 计算自适应列的宽度
 const adaptiveDescWidth = computed(() => {
-    const containerWidth = tableContainer.value?.clientWidth || 800
-    return containerWidth - fixedColumnsWidth
+    if (!tableContainer.value) return 200
+    const containerWidth = tableContainer.value.clientWidth
+    return Math.max(Math.floor(containerWidth - fixedColumnsWidth), 150)
 })
 
 
-const renderTag = (cellData: string, rowData: object, typeDom: string, color: string, dict?: Array<DictItem>, className?: string) => {
+
+const renderTag = (cellData: string, rowData: TaskItem, typeDom: string, color: string, dict?: Array<DictItem>, className?: string) => {
     return h(table_v2_tag, {
         value: cellData,
         size: 'small',
@@ -33,23 +36,26 @@ const renderTag = (cellData: string, rowData: object, typeDom: string, color: st
     });
 };
 
-const renderOwner = (cellData: string, rowData: object, color?: string) => {
-    return h(Owner, {
+const renderOwner = (cellData: string, rowData: TaskItem, color?: string) => {
+    return h(ownerVue, {
         value: cellData,
         row: rowData,
         color: color
     });
 };
 
-const renderSchedule = (cellData: string, rowData: object, color?: string) => {
+const renderSchedule = (cellData: string, rowData: TaskItem, index: number, color?: string) => {
     return h(scheduleContent, {
         value: cellData,
         row: rowData,
-        color: color
+        color: color,
+        onChangeDate: (val) => {
+            allData.value[index].schedule = val
+        }
     });
 };
 
-const renderScheduleHeader = (cellData: string, rowData: object, color?: string) => {
+const renderScheduleHeader = (cellData: string, rowData: TaskItem, color?: string) => {
     return h(scheduleHeader, {
         value: cellData,
         row: rowData,
@@ -116,6 +122,7 @@ const columns = reactive([
         dataKey: 'id',
         class: 'tableItems',
         width: 50,
+        flexGrow: 0,
         cellRenderer: ({ cellData, rowData, rowIndex }) => renderCellCheckout(cellData, rowIndex),
         headerCellRenderer: ({ }) => renderHeaderCheckout()
     },
@@ -124,6 +131,7 @@ const columns = reactive([
         title: '版本规划',
         dataKey: 'version',
         class: 'tableItems',
+        flexGrow: 0,
         width: 80,
         cellRenderer: ({ cellData, rowData }) => renderTag(cellData, rowData, 'tag', '#f2f3f5', [], 'tagRadius')
     },
@@ -132,6 +140,7 @@ const columns = reactive([
         title: '任务流程',
         dataKey: 'flow',
         class: 'tableItems',
+        flexGrow: 0,
         width: 80,
         cellRenderer: ({ cellData, rowData }) => renderTag(cellData, rowData, 'tag', '', flowDict)
     },
@@ -140,6 +149,7 @@ const columns = reactive([
         title: '优先级',
         dataKey: 'priority',
         class: 'tableItems',
+        flexGrow: 0,
         width: 80,
         cellRenderer: ({ cellData, rowData }) => renderTag(cellData, rowData, 'tag', '', priorityDict)
     },
@@ -148,7 +158,8 @@ const columns = reactive([
         title: '任务名称',
         dataKey: 'name',
         class: 'tableItems',
-        width: adaptiveDescWidth,
+        flexGrow: 1,
+        width: 150,
         cellRenderer: ({ cellData, rowData }) => h('span', { class: 'px-4' }, cellData)
     },
     {
@@ -164,6 +175,7 @@ const columns = reactive([
         title: '任务状态',
         dataKey: 'status',
         class: 'tableItems',
+        flexGrow: 0,
         width: 150,
         cellRenderer: ({ cellData, rowData }) => renderTag(cellData, rowData, 'tagWithText', '', statusDict)
     },
@@ -172,6 +184,7 @@ const columns = reactive([
         title: '所属模块',
         dataKey: 'module',
         class: 'tableItems',
+        flexGrow: 0,
         width: 150,
         cellRenderer: ({ cellData, rowData }) => renderTag(cellData, rowData, 'text', '')
     },
@@ -180,9 +193,10 @@ const columns = reactive([
         title: '排期',
         dataKey: 'schedule',
         class: 'tableItems',
+        flexGrow: 0,
         width: 242,
         headerClass: 'schedule',
-        cellRenderer: ({ cellData, rowData }) => renderSchedule(cellData, rowData, 'colText'),
+        cellRenderer: ({ cellData, rowData, rowIndex }) => renderSchedule(cellData, rowData, rowIndex, 'colText'),
         headerCellRenderer: ({ cellData, rowData }) => renderScheduleHeader(cellData, rowData, 'colText')
     },
 ])
@@ -194,8 +208,9 @@ const generateMockData = (count) => {
     const priorities = ['P0', 'P1', 'P2', 'P3', 'P4', '待定', '暂定',]
     const statuses = ['进行中', '策划中', '待确认']
     const modules = ['未命名模块']
-    const owners = ['罗密欧与朱丽叶', '麦老头', '欧阳娜娜']
+    const owners = ['罗密欧与朱丽叶', '麦老头']
     const versions = ['V1.1.1', 'V1.0.0', '未规划']
+    const avatar = [`https://picsum.photos/seed/22/24/24`]
 
     return Mock.mock({
         [`list|${count}`]: [
@@ -209,12 +224,29 @@ const generateMockData = (count) => {
                 'status|1': statuses,
                 'duration': '@pick(["7个月", "6个月", "5个月"])',
                 'module|1': modules,
-                'schedule': '待填',
-                'totalSchedule': '05/16 ~ 05/16',
-                'avatar': `https://picsum.photos/seed/${Mock.Random.integer(1, 100)}/24/24`
+                'schedule': '',
+                'checked': false,
+                'totalSchedule': function () {
+                    const start = `2026-0${Math.floor(Math.random() * 9 + 1)}-04`
+                    const date = new Date(start);
+                    date.setMonth(date.getMonth() + 2);
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const end = `${year}-${month}-${day}`;
+
+                    return [start, end]
+                },
+                'avatar': function (owner: { context: { currentContext: { owner: string } } }) {
+                    if (owner.context.currentContext.owner === '麦老头') {
+                        return null
+                    } else {
+                        return avatar[0]
+                    }
+                }
             }
         ]
-    }).list
+    }).list as Array<TaskItem>
 }
 
 // --- 响应式数据 ---
@@ -239,7 +271,16 @@ onUnmounted(() => {
     tableContainer.value?.removeEventListener('scroll', handleScroll)
 })
 
+let resizeTimer: NodeJS.Timeout | null = null
 const handleResize = () => {
+    if (resizeTimer) clearTimeout(resizeTimer)
+    resizeTimer = setTimeout(async () => {
+        nextTick(() => {
+            if (tableContainer.value) {
+                tableContainer.value.dispatchEvent(new Event('resize'))
+            }
+        })
+    }, 50)
 }
 
 onMounted(() => {
@@ -257,7 +298,7 @@ onUnmounted(() => {
         <el-auto-resizer>
             <template #default="{ height, width }">
                 <div ref="tableContainer">
-                    <el-table-v2 :columns="columns" :data="allData" :width="width" :height="height" fixed />
+                    <el-table-v2 :columns="columns" :data="allData" :width="width" :height="height" :fixed="false" />
                 </div>
             </template>
         </el-auto-resizer>

@@ -10,10 +10,10 @@ export interface TaskItem {
   duration: string
   module: string
   schedule: string
-  totalSchedule: string
+  totalSchedule: Array<number>
   avatar: string
+  checked: boolean
 }
-
 
 // Tag 类型映射
 export type PriorityType = 'danger' | 'warning' | 'info' | ''

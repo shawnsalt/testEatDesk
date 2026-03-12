@@ -10,11 +10,25 @@ const locale = zhCn
   </el-config-provider>
 </template>
 
-<style scoped>
+<style>
 * {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
+}
 
+.noPrefix {
+  .el-input__prefix {
+    display: none !important;
+  }
+}
+
+.noBorder {
+  .el-input__wrapper {
+    box-shadow: none !important;
+    --el-input-bg-color: transparent;
+    padding: 0 !important;
+
+  }
 }
 </style>
