@@ -99,7 +99,99 @@ const renderHeaderCheckout = () => {
 }
 
 const infoSet = reactive({
-    checkList: []
+    checkList: [],
+    columns: [
+
+        {
+            key: 'id',
+            title: '',
+            dataKey: 'id',
+            class: 'tableItems',
+            headerClass: '',
+            width: 50,
+            flexGrow: 0,
+            cellRenderer: ({ cellData, rowData, rowIndex }) => renderCellCheckout(cellData, rowData, rowIndex),
+            headerCellRenderer: ({ }) => renderHeaderCheckout()
+        },
+        {
+            key: 'version',
+            title: '版本规划',
+            dataKey: 'version',
+            class: 'tableItems',
+            headerClass: '',
+            flexGrow: 0,
+            width: 80,
+            cellRenderer: ({ cellData, rowData }) => renderTag(cellData, rowData, 'tag', '#f2f3f5', [], 'tagRadius')
+        },
+        {
+            key: 'flow',
+            title: '任务流程',
+            dataKey: 'flow',
+            class: 'tableItems',
+            headerClass: '',
+            flexGrow: 0,
+            width: 80,
+            cellRenderer: ({ cellData, rowData }) => renderTag(cellData, rowData, 'tag', '', flowDict)
+        },
+        {
+            key: 'priority',
+            title: '优先级',
+            dataKey: 'priority',
+            class: 'tableItems',
+            headerClass: '',
+            flexGrow: 0,
+            width: 80,
+            cellRenderer: ({ cellData, rowData }) => renderTag(cellData, rowData, 'tag', '', priorityDict)
+        },
+        {
+            key: 'name',
+            title: '任务名称',
+            dataKey: 'name',
+            class: 'tableItems',
+            headerClass: '',
+            flexGrow: 1,
+            width: 150,
+            cellRenderer: ({ cellData, rowData }) => h('span', { class: 'px-4' }, cellData)
+        },
+        {
+            key: 'owner',
+            title: '当前负责人',
+            dataKey: 'owner',
+            class: 'tableItems',
+            headerClass: '',
+            width: 132,
+            cellRenderer: ({ cellData, rowData }) => renderOwner(cellData, rowData, 'avatar')
+        },
+        {
+            key: 'status',
+            title: '任务状态',
+            dataKey: 'status',
+            class: 'tableItems',
+            flexGrow: 0,
+            width: 150,
+            cellRenderer: ({ rowData }) => renderTagWithText(rowData, statusDict)
+        },
+        {
+            key: 'module',
+            title: '所属模块',
+            dataKey: 'module',
+            class: 'tableItems',
+            flexGrow: 0,
+            width: 150,
+            cellRenderer: ({ cellData, rowData }) => renderTag(cellData, rowData, 'text', '')
+        },
+        {
+            key: 'schedule',
+            title: '排期',
+            dataKey: 'schedule',
+            class: 'tableItems',
+            flexGrow: 0,
+            width: 242,
+            headerClass: 'schedule',
+            cellRenderer: ({ cellData, rowData, rowIndex }) => renderSchedule(cellData, rowData, rowIndex, 'colText'),
+            headerCellRenderer: ({ }) => renderScheduleHeader()
+        },
+    ]
 })
 
 const renderCellCheckout = (cellData, rowData, index) => {
@@ -141,99 +233,6 @@ const statusDict = [
     { label: "", value: "策划中", color: "#e4effe" },
     { label: "", value: "待确认", color: "#ffefd9" }
 ]
-
-const columns = reactive([
-
-    {
-        key: 'id',
-        title: '',
-        dataKey: 'id',
-        class: 'tableItems',
-        headerClass: '',
-        width: 50,
-        flexGrow: 0,
-        cellRenderer: ({ cellData, rowData, rowIndex }) => renderCellCheckout(cellData, rowData, rowIndex),
-        headerCellRenderer: ({ }) => renderHeaderCheckout()
-    },
-    {
-        key: 'version',
-        title: '版本规划',
-        dataKey: 'version',
-        class: 'tableItems',
-        headerClass: '',
-        flexGrow: 0,
-        width: 80,
-        cellRenderer: ({ cellData, rowData }) => renderTag(cellData, rowData, 'tag', '#f2f3f5', [], 'tagRadius')
-    },
-    {
-        key: 'flow',
-        title: '任务流程',
-        dataKey: 'flow',
-        class: 'tableItems',
-        headerClass: '',
-        flexGrow: 0,
-        width: 80,
-        cellRenderer: ({ cellData, rowData }) => renderTag(cellData, rowData, 'tag', '', flowDict)
-    },
-    {
-        key: 'priority',
-        title: '优先级',
-        dataKey: 'priority',
-        class: 'tableItems',
-        headerClass: '',
-        flexGrow: 0,
-        width: 80,
-        cellRenderer: ({ cellData, rowData }) => renderTag(cellData, rowData, 'tag', '', priorityDict)
-    },
-    {
-        key: 'name',
-        title: '任务名称',
-        dataKey: 'name',
-        class: 'tableItems',
-        headerClass: '',
-        flexGrow: 1,
-        width: 150,
-        cellRenderer: ({ cellData, rowData }) => h('span', { class: 'px-4' }, cellData)
-    },
-    {
-        key: 'owner',
-        title: '当前负责人',
-        dataKey: 'owner',
-        class: 'tableItems',
-        headerClass: '',
-        width: 132,
-        cellRenderer: ({ cellData, rowData }) => renderOwner(cellData, rowData, 'avatar')
-    },
-    {
-        key: 'status',
-        title: '任务状态',
-        dataKey: 'status',
-        class: 'tableItems',
-        flexGrow: 0,
-        width: 150,
-        cellRenderer: ({ rowData }) => renderTagWithText(rowData, statusDict)
-    },
-    {
-        key: 'module',
-        title: '所属模块',
-        dataKey: 'module',
-        class: 'tableItems',
-        flexGrow: 0,
-        width: 150,
-        cellRenderer: ({ cellData, rowData }) => renderTag(cellData, rowData, 'text', '')
-    },
-    {
-        key: 'schedule',
-        title: '排期',
-        dataKey: 'schedule',
-        class: 'tableItems',
-        flexGrow: 0,
-        width: 242,
-        headerClass: 'schedule',
-        cellRenderer: ({ cellData, rowData, rowIndex }) => renderSchedule(cellData, rowData, rowIndex, 'colText'),
-        headerCellRenderer: ({ }) => renderScheduleHeader()
-    },
-])
 
 
 // --- Mock 数据生成 ---
@@ -339,13 +338,13 @@ const startMoveHeader = (val) => {
     } else {
         moveKey.value = val.target.getAttribute('data-key')
     }
-    columns.some((item, index) => {
+    infoSet.columns.some((item, index) => {
         if (item.key === moveKey.value) {
             moveCol.value = index
             return
         }
     })
-    willAddCol.value = JSON.parse(JSON.stringify(columns[moveCol.value]))
+    willAddCol.value = JSON.parse(JSON.stringify(infoSet.columns[moveCol.value]))
 
 
     computedCol()
@@ -380,7 +379,7 @@ const move = (val) => {
                 willMoveDom = val.target.parentElement
             }
             let key = willMoveDom.getAttribute('data-key')
-            columns.some(item => {
+            infoSet.columns.some(item => {
                 if (item.key === key) {
                     item.class = 'tableItems BlueRightBorder'
                     if (key === 'schedule') {
@@ -436,24 +435,27 @@ const endMoveHeader = (val) => {
     let key = willMoveDom.getAttribute('data-key')
     let toMoveIndex = -1
     if (key !== moveKey.value && key) {
-        columns.splice(moveCol.value, 1)
+        infoSet.columns.splice(moveCol.value, 1)
 
-        columns.some((item, index) => {
+        infoSet.columns.some((item, index) => {
             if (item.key === key) {
                 toMoveIndex = index
                 return
             }
         })
         if (toMoveIndex !== -1) {
-            columns.splice(toMoveIndex + 1, 0, willAddCol.value)
+            infoSet.columns.splice(toMoveIndex + 1, 0, willAddCol.value)
         }
     }
-    columns.forEach(item => {
+    infoSet.columns.forEach(item => {
         item.class = 'tableItems'
         item.headerClass = item.key === 'schedule' ? 'schedule' : ''
     })
 
-    localStorage.setItem('columns', JSON.stringify(columns))
+    let keys = infoSet.columns.map(item => {
+        return item.key
+    })
+    localStorage.setItem('infoSet.columnsKeys', JSON.stringify(keys))
 
     moveCol.value = 0
     moveKey.value = ''
@@ -462,9 +464,17 @@ const endMoveHeader = (val) => {
 }
 
 onMounted(() => {
-    let storageColumns = JSON.parse(localStorage.getItem('columns'))
+    let storageColumns = JSON.parse(localStorage.getItem('infoSet.columnsKeys'))
     if (storageColumns) {
-        columns = storageColumns
+        let newColumns = []
+        storageColumns.forEach(key => {
+            newColumns.push(infoSet.columns.filter((col, index) => {
+                return key === col.key
+            })[0])
+        })
+        console.log(newColumns)
+        infoSet.columns = newColumns
+
     }
     moveArea.value = document.querySelector('.moveArea')
     moveItem.value = document.querySelector('.moveItem')
@@ -488,7 +498,7 @@ onUnmounted(() => {
             <template #default="{ height, width }">
                 <div ref="tableContainerRef" @mousedown="startMoveHeader" @mousemove.stop="moveHeader"
                     @mouseleave="leaveHeader" @mouseup="endMoveHeader">
-                    <el-table-v2 :columns="columns" :data="allData" :width="width" :height="height"
+                    <el-table-v2 :columns="infoSet.columns" :data="allData" :width="width" :height="height"
                         header-class="tableV2Header" :fixed="false" />
                 </div>
             </template>
