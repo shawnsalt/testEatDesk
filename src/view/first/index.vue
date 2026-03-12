@@ -55,39 +55,66 @@ const renderSchedule = (cellData: string, rowData: TaskItem, index: number, colo
     });
 };
 
-const renderScheduleHeader = (cellData: string, rowData: TaskItem, color?: string) => {
-    return h(scheduleHeader, {
-        value: cellData,
-        row: rowData,
-        color: color
-    });
+const renderScheduleHeader = () => {
+    return h(scheduleHeader, {});
 };
 
 const renderHeaderCheckout = () => {
     const _data = unref(allData)
-    const onChange = (value) =>
-    (allData.value = _data.map((rowData) => {
-        rowData.checked = value
-        return rowData
-    }))
-    const allSelected = _data.every((rowData) => rowData.checked)
-    const containsChecked = _data.some((rowData) => rowData.checked)
+    const allSelected = _data.length === infoSet.checkList.length
+    const containsChecked = infoSet.checkList.length < _data.length && infoSet.checkList.length > 0
+    const onChange = (checked: boolean) => {
+        console.log(checked)
+        if (!containsChecked && checked) {
+            infoSet.checkList = _data.map(item => { return item.id })
+
+        } else if (containsChecked && checked) {
+            infoSet.checkList = _data.map(item => { return item.id })
+        }
+        else if (containsChecked && !allSelected) {
+            infoSet.checkList = _data.map(item => {
+                return item.id
+            })
+        } else if (checked) {
+            infoSet.checkList = _data.map(item => { return item.id })
+        } else {
+            infoSet.checkList = []
+
+        }
+        console.log(infoSet.checkList)
+    }
+
     return h(selectionForTable, {
-        value: allSelected,
+        id: 0,
+        list: infoSet.checkList,
         intermediate: containsChecked && !allSelected,
         ariaLabel: t('el.table.selectAllLabel'),
-        onChange: () => onChange
+        allLength: allData.value.length,
+        onChooseChange: (id) => onChange(id)
     }
     )
 }
 
-const renderCellCheckout = (rowData, index) => {
-    const onChange = (value) => (rowData.checked = value)
+const infoSet = reactive({
+    checkList: []
+})
+
+const renderCellCheckout = (cellData, rowData, index) => {
+    const onChange = (value: number) => {
+        let idIndex = infoSet.checkList.findIndex(item => item === value)
+        console.log(idIndex)
+        if (idIndex !== -1) {
+            infoSet.checkList.splice(idIndex, 1)
+        } else {
+            infoSet.checkList.push(value)
+        }
+    }
     return h(selectionForTable, {
-        value: rowData.checked,
+        list: infoSet.checkList,
+        id: cellData,
         ariaLabel: t('el.table.selectrowDataLabel'),
         index: index + 1,
-        onChange: () => onChange
+        onChooseChange: (id) => onChange(id)
     }
     )
 }
@@ -123,7 +150,7 @@ const columns = reactive([
         class: 'tableItems',
         width: 50,
         flexGrow: 0,
-        cellRenderer: ({ cellData, rowData, rowIndex }) => renderCellCheckout(cellData, rowIndex),
+        cellRenderer: ({ cellData, rowData, rowIndex }) => renderCellCheckout(cellData, rowData, rowIndex),
         headerCellRenderer: ({ }) => renderHeaderCheckout()
     },
     {
@@ -197,7 +224,7 @@ const columns = reactive([
         width: 242,
         headerClass: 'schedule',
         cellRenderer: ({ cellData, rowData, rowIndex }) => renderSchedule(cellData, rowData, rowIndex, 'colText'),
-        headerCellRenderer: ({ cellData, rowData }) => renderScheduleHeader(cellData, rowData, 'colText')
+        headerCellRenderer: ({ }) => renderScheduleHeader()
     },
 ])
 
