@@ -27,5 +27,6 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     Selection: typeof import('./src/components/table_v2/components/selection.vue')['default']
     Table_v2: typeof import('./src/components/table_v2/index.vue')['default']
+    Tag: typeof import('./src/components/table_v2/tag.vue')['default']
   }
 }

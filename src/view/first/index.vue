@@ -3,16 +3,14 @@ import { ref, computed, onMounted, onUnmounted, reactive, nextTick, unref } from
 import { useLocale } from 'element-plus'
 const { t } = useLocale()
 import Mock from 'mockjs'
-import table_v2 from '@/components/table_v2/index.vue'
+import table_v2_tag from '@/components/table_v2/tag.vue'
 import selectionForTable from '@/components/table_v2/components/selection.vue'
 import { h } from 'vue'
-import Flow from './components/flow.vue'
-import Priority from './components/priority.vue'
 import Owner from './components/owner.vue'
 import scheduleHeader from './components/schedule/header.vue'
 import scheduleContent from './components/schedule/content.vue'
-import versionTag from './components/version.vue'
-
+import { DictItem } from '@/type/utils'
+import { selectByDict } from '@/utils/index.js'
 // 固定列的总宽度
 const fixedColumnsWidth = 50 + 80 + 80 + 80 + 132 + 150 + 150 + 242
 
@@ -24,41 +22,18 @@ const adaptiveDescWidth = computed(() => {
 })
 
 
-const renderStatusTag = (cellData: string, rowData: object, typeDom: string, color?: string) => {
-    return h(table_v2, {
+const renderTag = (cellData: string, rowData: object, typeDom: string, color: string, dict?: Array<DictItem>, className?: string) => {
+    return h(table_v2_tag, {
         value: cellData,
         size: 'small',
         row: rowData,
         typeDom: typeDom,
-        color: color
+        color: typeDom === 'text' ? '' : color || selectByDict(cellData, 'value', dict)?.[0]?.color,
+        class: className
     });
 };
 
-const renderVersionTag = (cellData: string, rowData: object, color?: string) => {
-    return h(versionTag, {
-        value: cellData,
-        rowData: rowData,
-        color: color
-    });
-};
-
-const renderFlowTag = (cellData: string, rowData: object, color?: string) => {
-    return h(Flow, {
-        value: cellData,
-        rowData: rowData,
-        color: color
-    });
-};
-
-const renderPriorityTag = (cellData: string, rowData: object, color?: string) => {
-    return h(Priority, {
-        value: cellData,
-        rowData: rowData,
-        color: color
-    });
-};
-
-const renderowDatanerTag = (cellData: string, rowData: object, color?: string) => {
+const renderOwner = (cellData: string, rowData: object, color?: string) => {
     return h(Owner, {
         value: cellData,
         row: rowData,
@@ -66,7 +41,7 @@ const renderowDatanerTag = (cellData: string, rowData: object, color?: string) =
     });
 };
 
-const renderScheduleTag = (cellData: string, rowData: object, color?: string) => {
+const renderSchedule = (cellData: string, rowData: object, color?: string) => {
     return h(scheduleContent, {
         value: cellData,
         row: rowData,
@@ -111,6 +86,26 @@ const renderCellCheckout = (rowData, index) => {
     )
 }
 
+const flowDict = [
+    { label: "", value: "需求", color: "#dff3f7" },
+    { label: "", value: "设计", color: "#ffefd9" },
+    { label: "", value: "走查", color: "#fae9f9" }
+]
+
+const priorityDict = [
+    { label: "", value: "暂定", color: "#f0f1f5" },
+    { label: "", value: "待定", color: "#e4effe" },
+    { label: "", value: "P0", color: "#fee1e1" },
+    { label: "", value: "P1", color: "#ffefd9" },
+    { label: "", value: "P2", color: "#e7fae3" },
+    { label: "", value: "P3", color: "#dff3f7" },
+    { label: "", value: "P4", color: "#fae9f9" }
+]
+const statusDict = [
+    { label: "", value: "进行中", color: "#e4effe" },
+    { label: "", value: "策划中", color: "#e4effe" },
+    { label: "", value: "待确认", color: "#ffefd9" }
+]
 
 
 const columns = reactive([
@@ -130,7 +125,7 @@ const columns = reactive([
         dataKey: 'version',
         class: 'tableItems',
         width: 80,
-        cellRenderer: ({ cellData, rowData }) => renderVersionTag(cellData, rowData, '#f2f3f5')
+        cellRenderer: ({ cellData, rowData }) => renderTag(cellData, rowData, 'tag', '#f2f3f5', [], 'tagRadius')
     },
     {
         key: 'flow',
@@ -138,7 +133,7 @@ const columns = reactive([
         dataKey: 'flow',
         class: 'tableItems',
         width: 80,
-        cellRenderer: ({ cellData, rowData }) => renderFlowTag(cellData, rowData)
+        cellRenderer: ({ cellData, rowData }) => renderTag(cellData, rowData, 'tag', '', flowDict)
     },
     {
         key: 'priority',
@@ -146,7 +141,7 @@ const columns = reactive([
         dataKey: 'priority',
         class: 'tableItems',
         width: 80,
-        cellRenderer: ({ cellData, rowData }) => renderPriorityTag(cellData, rowData, 'tag')
+        cellRenderer: ({ cellData, rowData }) => renderTag(cellData, rowData, 'tag', '', priorityDict)
     },
     {
         key: 'name',
@@ -162,7 +157,7 @@ const columns = reactive([
         dataKey: 'owner',
         class: 'tableItems',
         width: 132,
-        cellRenderer: ({ cellData, rowData }) => renderowDatanerTag(cellData, rowData, 'avatar')
+        cellRenderer: ({ cellData, rowData }) => renderOwner(cellData, rowData, 'avatar')
     },
     {
         key: 'status',
@@ -170,7 +165,7 @@ const columns = reactive([
         dataKey: 'status',
         class: 'tableItems',
         width: 150,
-        cellRenderer: ({ cellData, rowData }) => renderStatusTag(cellData, rowData, 'tagWithText')
+        cellRenderer: ({ cellData, rowData }) => renderTag(cellData, rowData, 'tagWithText', '', statusDict)
     },
     {
         key: 'module',
@@ -178,7 +173,7 @@ const columns = reactive([
         dataKey: 'module',
         class: 'tableItems',
         width: 150,
-        cellRenderer: ({ cellData, rowData }) => renderStatusTag(cellData, rowData, 'text')
+        cellRenderer: ({ cellData, rowData }) => renderTag(cellData, rowData, 'text', '')
     },
     {
         key: 'schedule',
@@ -187,7 +182,7 @@ const columns = reactive([
         class: 'tableItems',
         width: 242,
         headerClass: 'schedule',
-        cellRenderer: ({ cellData, rowData }) => renderScheduleTag(cellData, rowData, 'colText'),
+        cellRenderer: ({ cellData, rowData }) => renderSchedule(cellData, rowData, 'colText'),
         headerCellRenderer: ({ cellData, rowData }) => renderScheduleHeader(cellData, rowData, 'colText')
     },
 ])
@@ -196,7 +191,7 @@ const columns = reactive([
 // --- Mock 数据生成 ---
 const generateMockData = (count) => {
     const flows = ['需求', '设计', '走查']
-    const priorities = ['P0', 'P1', 'P2', 'P3', 'P4', null]
+    const priorities = ['P0', 'P1', 'P2', 'P3', 'P4', '待定', '暂定',]
     const statuses = ['进行中', '策划中', '待确认']
     const modules = ['未命名模块']
     const owners = ['罗密欧与朱丽叶', '麦老头', '欧阳娜娜']
