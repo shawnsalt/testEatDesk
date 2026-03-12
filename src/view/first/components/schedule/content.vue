@@ -4,7 +4,7 @@
         <div class="px-4 h-full flex items-center leftText">
             <el-date-picker class="noBorder noPrefix" style="width: 100%;" v-model="date" type="date" placeholder="待填"
                 :clearable=false stlye="--el-input-border:transparent" prefix-icon="false" value-format="YYYY-MM-DD"
-                :teleported="false" @change="chooseDate" />
+                size="large" :teleported="false" @change="chooseDate" />
         </div>
         <div class="px-4 h-full flex items-center rightText" :class="[isRed]">
             {{ formatterStart + ' ~ ' + formatterEnd }}

@@ -12,6 +12,7 @@ import scheduleContent from './components/schedule/content.vue'
 import { DictItem } from '@/type/utils'
 import { selectByDict } from '@/utils/index.js'
 import { TaskItem } from '@/type/first'
+import TagWithText from './components/tagWithText.vue'
 // 固定列的总宽度
 const fixedColumnsWidth = 50 + 80 + 80 + 80 + 132 + 150 + 150 + 242
 
@@ -41,6 +42,16 @@ const renderOwner = (cellData: string, rowData: TaskItem, color?: string) => {
         value: cellData,
         row: rowData,
         color: color
+    });
+};
+
+const renderTagWithText = (rowData: TaskItem, dict?: Array<DictItem>, className?: string) => {
+    return h(TagWithText, {
+        tagText: rowData.status,
+        text: rowData.duration,
+        row: rowData,
+        color: selectByDict(rowData.status, 'value', dict)?.[0]?.color,
+        class: className
     });
 };
 
@@ -204,7 +215,7 @@ const columns = reactive([
         class: 'tableItems',
         flexGrow: 0,
         width: 150,
-        cellRenderer: ({ cellData, rowData }) => renderTag(cellData, rowData, 'tagWithText', '', statusDict)
+        cellRenderer: ({ rowData }) => renderTagWithText(rowData, statusDict)
     },
     {
         key: 'module',

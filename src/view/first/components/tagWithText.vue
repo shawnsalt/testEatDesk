@@ -1,10 +1,10 @@
 <template>
-    <div class="flex justify-center" :class="[typeDom === 'text' ? 'items-start' : 'items-center']">
-        <div class="tag" :style="{ backgroundColor: color }" type="info" v-if="typeDom === 'tag'">
-            <span>{{ value }}</span>
-        </div>
-        <div class="px-4" v-else>
-            {{ value }}
+    <div class="flex items-center justify-center">
+        <div class="tagWithText flex items-center justify-center">
+            <div class="tag" :style="{ backgroundColor: color }" type="info">
+                <span>{{ tagText }}</span>
+            </div>
+            <span class="info">{{ text }}</span>
         </div>
     </div>
 
@@ -13,20 +13,19 @@
 import { computed } from 'vue'
 // 定义组件的 props
 interface Props {
-    value: string | number; // 状态值（如 'success'/'warning'）
+    tagText: string | number;
+    text?: string;
     row: object,
     color?: string;
-    mode?: string;
-    typeDom?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    size: 'small',
+    tagText: '',
+    text: '',
     row: () => {
         return {}
     },
     color: '',
-    typeDom: 'text'
 });
 
 
@@ -40,7 +39,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 .tagWithText {
     .info {
-        font-size: 0.8rem;
+        font-size: 1rem;
         padding-left: 0.4rem;
         color: #999999;
     }
