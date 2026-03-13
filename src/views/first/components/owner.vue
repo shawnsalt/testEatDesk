@@ -1,7 +1,7 @@
 <template>
     <div class="flex justify-center items-center">
         <div class="avatar">
-            <el-avatar :src="row.avatar" :size="25" style="background: linear-gradient(304deg, #9d2cec, #e1b7ff)">
+            <el-avatar :src="row.avatar" :size="25" :style="{ background: background }">
                 {{ String(value).slice(0, 1).toUpperCase() }}
             </el-avatar>
             <span class="name no-wrap">{{ value }}</span>
@@ -15,15 +15,15 @@ import { TaskItem } from '@/type/first'
 interface Props {
     value: string | number; // 状态值（如 'success'/'warning'）
     row: TaskItem,
-    color?: string;
-    map?: Record<string, { label: string; type: string }>;
-    typeDom?: string;
+    background?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    size: 'small',
-    color: '',
-    typeDom: 'text'
+    value: '',
+    row: () => {
+        return {} as TaskItem
+    },
+    background: '',
 });
 </script>
 <style scoped>

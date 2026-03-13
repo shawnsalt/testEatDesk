@@ -10,20 +10,19 @@
 
 </template>
 <script setup lang="ts">
-import { computed } from 'vue'
+import { TaskItem } from '@/type/first';
 // 定义组件的 props
 interface Props {
     value: string | number; // 状态值（如 'success'/'warning'）
-    row: object,
+    row: TaskItem,
     color?: string;
     mode?: string;
     typeDom?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    size: 'small',
     row: () => {
-        return {}
+        return {} as TaskItem
     },
     color: '',
     typeDom: 'text'

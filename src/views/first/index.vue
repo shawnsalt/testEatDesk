@@ -21,7 +21,6 @@ import { More, RefreshLeft } from '@element-plus/icons-vue'
 const renderTag = (cellData: string, rowData: TaskItem, typeDom: string, color: string, dict?: Array<DictItem>, className?: string) => {
     return h(table_v2_tag, {
         value: cellData,
-        size: 'small',
         row: rowData,
         typeDom: typeDom,
         color: typeDom === 'text' ? '' : color || selectByDict(cellData, 'label', dict)?.[0]?.color,
@@ -29,21 +28,20 @@ const renderTag = (cellData: string, rowData: TaskItem, typeDom: string, color: 
     });
 };
 
-const renderOwner = (cellData: string, rowData: TaskItem, color?: string) => {
+const renderOwner = (cellData: string, rowData: TaskItem, background?: string) => {
     return h(ownerVue, {
         value: cellData,
         row: rowData,
-        color: color
+        background: background
     });
 };
 
-const renderTagWithText = (rowData: TaskItem, dict?: Array<DictItem>, className?: string) => {
+const renderTagWithText = (rowData: TaskItem, dict?: Array<DictItem>) => {
     return h(TagWithText, {
         tagText: rowData.status,
         text: rowData.duration,
         row: rowData,
-        color: selectByDict(rowData.status, 'value', dict)?.[0]?.color,
-        class: className
+        color: selectByDict(rowData.status, 'label', dict)?.[0]?.color,
     });
 };
 
@@ -78,12 +76,33 @@ const renderHeaderCheckout = () => {
         id: 0,
         list: infoSet.checkList,
         intermediate: containsChecked && !allSelected,
+        index: 0,
         ariaLabel: t('el.table.selectAllLabel'),
         allLength: allData.value.length,
         onChooseChange: (id) => onChange(id)
     }
     )
 }
+
+const renderCellCheckout = (cellData: number, index: number) => {
+    const onChange = (value: number) => {
+        let idIndex = infoSet.checkList.findIndex((item: number) => item === value)
+        if (idIndex !== -1) {
+            infoSet.checkList.splice(idIndex, 1)
+        } else {
+            infoSet.checkList.push(value)
+        }
+    }
+    return h(selectionForTable, {
+        list: infoSet.checkList,
+        id: cellData,
+        ariaLabel: t('el.table.selectrowDataLabel'),
+        index: index + 1,
+        onChooseChange: (id) => onChange(id)
+    }
+    )
+}
+
 let initColumnsSort = []
 const infoSet = reactive({
     checkList: [],
@@ -153,7 +172,7 @@ const infoSet = reactive({
             headerClass: '',
             width: 130,
             minWidth: 130,
-            cellRenderer: ({ cellData, rowData }) => renderOwner(cellData, rowData, 'avatar')
+            cellRenderer: ({ cellData, rowData }) => renderOwner(cellData, rowData, 'linear-gradient(304deg, #9d2cec, #e1b7ff)')
         },
         {
             key: 'status',
@@ -184,30 +203,11 @@ const infoSet = reactive({
             width: 245,
             minWidth: 245,
             headerClass: 'schedule',
-            cellRenderer: ({ cellData, rowData, rowIndex }) => renderSchedule(cellData, rowData, rowIndex, 'colText'),
+            cellRenderer: ({ cellData, rowData, rowIndex }) => renderSchedule(cellData, rowData, rowIndex, '#ff0000'),
             headerCellRenderer: ({ }) => renderScheduleHeader()
         },
     ] as Array<Column>
 })
-
-const renderCellCheckout = (cellData: number, index: number) => {
-    const onChange = (value: number) => {
-        let idIndex = infoSet.checkList.findIndex((item: number) => item === value)
-        if (idIndex !== -1) {
-            infoSet.checkList.splice(idIndex, 1)
-        } else {
-            infoSet.checkList.push(value)
-        }
-    }
-    return h(selectionForTable, {
-        list: infoSet.checkList,
-        id: cellData,
-        ariaLabel: t('el.table.selectrowDataLabel'),
-        index: index + 1,
-        onChooseChange: (id) => onChange(id)
-    }
-    )
-}
 
 const flowDict: Array<DictItem> = [
     { label: "需求", value: "", color: "#dff3f7" },
@@ -287,16 +287,6 @@ const handleScroll = (el: Event) => {
     const target = el.target
 }
 
-
-onMounted(() => {
-    nextTick(() => {
-        tableContainerRef.value?.addEventListener('scroll', handleScroll)
-    })
-})
-
-onUnmounted(() => {
-    tableContainerRef.value?.removeEventListener('scroll', handleScroll)
-})
 
 let resizeTimer: ReturnType<typeof setTimeout> | null = null
 const handleResize = () => {
@@ -494,12 +484,16 @@ onMounted(() => {
     tableY = tableContainerRef.value.offsetTop
 
     window.addEventListener('resize', handleResize)
+    nextTick(() => {
+        tableContainerRef.value?.addEventListener('scroll', handleScroll)
+    })
 })
 
 onUnmounted(() => {
     moveArea = null
     moveItem = null
     window.removeEventListener('resize', handleResize)
+    tableContainerRef.value?.removeEventListener('scroll', handleScroll)
 })
 
 </script>
