@@ -8,13 +8,13 @@ const router = createRouter({
       redirect: '/first',
       name: 'home',
       component: () => import('@/layout/index.vue'),
-      children:[
+      children: [
         {
-          path:'first',
-          name:'first',
-          component:() => import("@/view/first/index.vue")
+          path: 'first',
+          name: 'first',
+          component: () => import('@/views/first/index.vue'),
         },
-      ]
+      ],
     },
   ],
 })
