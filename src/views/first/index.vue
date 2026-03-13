@@ -50,8 +50,8 @@ const renderSchedule = (cellData: string, rowData: TaskItem, index: number, colo
         value: cellData,
         row: rowData,
         color: color,
-        onChangeDate: (val) => {
-            allData.value[index].schedule = val
+        onChangeDate: (date: string) => {
+            allData.value[index].schedule = date
         }
     });
 };
@@ -104,7 +104,12 @@ const renderCellCheckout = (cellData: number, index: number) => {
 }
 
 let initColumnsSort = []
-const infoSet = reactive({
+type infoSetType = {
+    checkList: Array<number>
+    columns: Array<Column>
+}
+
+const infoSet = reactive<infoSetType>({
     checkList: [],
     columns: [
 
@@ -206,8 +211,17 @@ const infoSet = reactive({
             cellRenderer: ({ cellData, rowData, rowIndex }) => renderSchedule(cellData, rowData, rowIndex, '#ff0000'),
             headerCellRenderer: ({ }) => renderScheduleHeader()
         },
-    ] as Array<Column>
+    ]
 })
+
+const isInfoSetType = (value: unknown): value is infoSetType => {
+    return (
+        typeof value === 'object' &&
+        value !== null &&
+        'checkList' in value &&
+        'columns' in value
+    )
+}
 
 const flowDict: Array<DictItem> = [
     { label: "需求", value: "", color: "#dff3f7" },
@@ -280,7 +294,7 @@ const generateMockData = (count: number): Array<TaskItem> => {
 
 // --- 响应式数据 ---
 const allData = ref(generateMockData(1000)) // 生成1000条测试数据
-const tableContainerRef = ref(null)
+const tableContainerRef = ref<HTMLDivElement>(null)
 
 
 const handleScroll = (el: Event) => {
@@ -323,31 +337,32 @@ let moveCol = 0
 let moveKey = ''
 let willAddCol = ''
 const showArea = ref(false)
-const startMoveHeader = (event: any) => {
-    let willMoveDom = event.target
 
-    let flag = true
-    while (!willMoveDom.className.split(' ').includes('el-table-v2__header-cell') && flag) {
-        willMoveDom = willMoveDom.parentElement
-        if (willMoveDom.className.split(' ').includes('el-table-v2__body')) {
-            flag = false
-        }
-    }
-    if (!flag) {
+const getCellHeader = (target: EventTarget) => {
+    if (!(target instanceof Element)) return null
+    return target.closest('.el-table-v2__header-cell') as HTMLElement | null
+}
+
+const startMoveHeader = (event: PointerEvent) => {
+    let willMoveDom = event.target
+    let cell = getCellHeader(willMoveDom)
+
+    if (!cell) {
         return
     }
-    moveKey = willMoveDom.getAttribute('data-key')
-    infoSet.columns.some((column: Column, index) => {
+    moveKey = cell.getAttribute('data-key')
+    infoSet.columns.some((column: Column, index: number) => {
         if (column.key === moveKey) {
             moveCol = index
-            return
+            return true
         }
     })
     willAddCol = infoSet.columns[moveCol]
+
     showArea.value = true
     let x = event.pageX - tableX - 240
     let y = event.pageY - tableY - 120
-    let dom = willMoveDom.firstElementChild.cloneNode('deep')
+    let dom = cell.cloneNode(true)
 
     moveItem.innerHTML = ''
     moveItem.appendChild(dom)
@@ -358,23 +373,17 @@ const startMoveHeader = (event: any) => {
 
 }
 
-const move = (event: any) => {
-
-    let left = event.layerX
+const move = (event: MouseEvent) => {
     let willMoveDom = event.target
-    let flag = true
-
-    while (!willMoveDom.className.split(' ').includes('el-table-v2__header-cell') && flag) {
-        willMoveDom = willMoveDom.parentElement
-        if (willMoveDom.className.split(' ').includes('el-table-v2__body')) {
-            flag = false
-        }
-    }
-    if (!flag) {
+    let cell = getCellHeader(willMoveDom)
+    if (!cell) {
         return
     }
-    let key = willMoveDom.getAttribute('data-key')
-    infoSet.columns.some((column: Column) => {
+    let key = cell.getAttribute('data-key')
+    if (!isInfoSetType(infoSet)) {
+        return
+    }
+    infoSet.columns.forEach((column: Column) => {
         if (column.key === key) {
             column.class = 'table-items blue-right-border'
             if (key === 'schedule') {
@@ -385,7 +394,7 @@ const move = (event: any) => {
             }
         } else {
             column.class = 'table-items'
-            if (key === 'schedule') {
+            if (column.key === 'schedule') {
                 column.headerClass = 'schedule'
             } else {
                 column.headerClass = ''
@@ -417,20 +426,13 @@ const leaveHeader = () => {
 
 }
 
-const endMoveHeader = (event: any) => {
+const endMoveHeader = (event: PointerEvent) => {
     let willMoveDom = event.target
-    let flag = true
-    while (!willMoveDom.className.split(' ').includes('el-table-v2__header-cell') && flag) {
-        willMoveDom = willMoveDom.parentElement
-        if (willMoveDom.className.split(' ').includes('el-table-v2__body')) {
-            flag = false
-        }
-    }
-    if (!flag) {
+    let cell = getCellHeader(willMoveDom)
+    if (!cell) {
         return
     }
-
-    let key = willMoveDom.getAttribute('data-key')
+    let key = cell.getAttribute('data-key')
     let toMoveIndex = -1
     if (key !== moveKey && key) {
         infoSet.columns.splice(moveCol, 1)
@@ -535,11 +537,6 @@ onUnmounted(() => {
         </el-auto-resizer>
         <div class="move-area" v-show="showArea">
             <div class="move-item"></div>
-            <div class="move-more-icon">
-                <el-icon>
-                    <More />
-                </el-icon>
-            </div>
         </div>
     </div>
 </template>
@@ -624,7 +621,6 @@ onUnmounted(() => {
 .table-area .move-area {
     position: absolute;
     background-color: #fff;
-    padding: 0.5rem;
     box-shadow: 0 0 10px 5px #f2f3f5;
     display: flex;
     align-items: center;
@@ -632,17 +628,10 @@ onUnmounted(() => {
 }
 
 .table-area .move-area .move-item {
-    padding: 0 1rem;
-    min-width: 200px;
+    height: 50px;
 }
 
-.table-area .move-area .move-more-icon {
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 5px;
-    border: 1px solid #f2f3f5;
+.table-area .move-area .move-item :deep(.el-table-v2__header-cell) {
+    border: none;
 }
 </style>
