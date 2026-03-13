@@ -4,7 +4,7 @@
   <div class="common-layout w-full h-full flex">
     <el-container>
       <el-aside class="aside" width="240px"></el-aside>
-      <el-container class="rightAside">
+      <el-container class="right-aside">
         <el-header height="130px"></el-header>
         <el-main>
           <router-view></router-view>
@@ -15,32 +15,22 @@
 </template>
 
 <style scoped>
-.w-full {
-  width: 100%;
+.common-layout .aside {
+  border-right: 1px solid #f2f3f5;
+  background-color: #f7f9fc;
 }
 
-.h-full {
+.common-layout .el-container {
   height: 100%;
 }
 
-.common-layout {
-  .aside {
-    border-right: 1px solid #f2f3f5;
-    background-color: #f7f9fc;
-  }
 
-  .el-container {
-    height: 100%;
-  }
-
-
-  .el-main {
-    height: calc(100% - 130px);
-  }
+.common-layout .el-main {
+  height: calc(100% - 130px);
 }
 
 
-.rightAside {
+.common-layout .right-aside {
   background-color: #FFF;
 }
 </style>

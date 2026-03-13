@@ -5,7 +5,7 @@
                 :clearable=false stlye="--el-input-border:transparent" prefix-icon="false" value-format="YYYY-MM-DD"
                 size="large" :teleported="false" @change="chooseDate" />
         </div>
-        <div class="px-4 h-full flex items-center right-text" :class="[isRed]">
+        <div class="px-4 h-full flex items-center right-text" :style="{ color: hasColor ? color : '' }">
             {{ formatterStart + ' ~ ' + formatterEnd }}
         </div>
     </div>
@@ -19,6 +19,7 @@ import { formatDate } from '@/utils/index'
 interface Props {
     value: string | number;
     row: TaskItem,
+    color: string,
 }
 const emit = defineEmits(['changeDate'])
 
@@ -26,7 +27,8 @@ const props = withDefaults(defineProps<Props>(), {
     value: '',
     row: () => {
         return {} as TaskItem
-    }
+    },
+    color: ''
 });
 const formatterStart = computed(() => {
     return formatDate(props.row.totalSchedule[0], 'MM/dd')
@@ -36,11 +38,11 @@ const formatterEnd = computed(() => {
     return formatDate(props.row.totalSchedule[1], 'MM/dd')
 })
 
-const isRed = computed(() => {
+const hasColor = computed(() => {
     let nowMonth = new Date().getMonth() + 1
     let month = new Date(props.row.totalSchedule[1]).getMonth() + 1
     if (nowMonth >= month) {
-        return 'red'
+        return 'hasColor'
     } else {
         return ''
     }
@@ -68,9 +70,5 @@ const chooseDate = (val: string) => {
 
 .content .right-text {
     flex: 1;
-}
-
-.content .right-text.red {
-    color: red;
 }
 </style>
