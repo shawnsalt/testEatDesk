@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 // 定义组件的 props
 interface Props {
     list: Array<number>,
@@ -24,9 +24,9 @@ const emit = defineEmits(['chooseChange'])
 const flag = ref(false)
 
 
-const changeCheckBox = (val) => {
+const changeCheckBox = (checked: boolean) => {
     if (props.id === 0) {
-        emit('chooseChange', val)
+        emit('chooseChange', checked)
     } else {
         emit('chooseChange', props.id)
 
