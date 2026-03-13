@@ -10,8 +10,8 @@ export interface TaskItem {
   duration: string
   module: string
   schedule: string
-  totalSchedule: Array<number>
-  avatar: string
+  totalSchedule: Array<string>
+  avatar: string | null
   checked: boolean
 }
 
