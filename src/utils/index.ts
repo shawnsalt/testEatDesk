@@ -5,9 +5,7 @@ export function selectByDict(
   dictList: Array<DictItem>,
 ): Array<DictItem> {
   return dictList.filter((dict: DictItem) => {
-    if (dict[mode] === value) {
-      return dict
-    }
+    return dict[mode] === value
   })
 }
 

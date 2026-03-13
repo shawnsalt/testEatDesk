@@ -17,18 +17,14 @@ const locale = zhCn
   box-sizing: border-box;
 }
 
-.noPrefix {
-  .el-input__prefix {
-    display: none !important;
-  }
+.no-prefix .el-input__prefix {
+  display: none !important;
 }
 
-.noBorder {
-  .el-input__wrapper {
-    box-shadow: none !important;
-    --el-input-bg-color: transparent;
-    padding: 0 !important;
+.no-border .el-input__wrapper {
+  box-shadow: none !important;
+  --el-input-bg-color: transparent;
+  padding: 0 !important;
 
-  }
 }
 </style>
