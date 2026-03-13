@@ -16,11 +16,11 @@ interface Props {
     value: string | number; // 状态值（如 'success'/'warning'）
     row: TaskItem,
     color?: string;
-    mode?: string;
     typeDom?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
+    value: '',
     row: () => {
         return {} as TaskItem
     },
@@ -31,17 +31,9 @@ const props = withDefaults(defineProps<Props>(), {
 
 </script>
 <style scoped>
-.tagRadius {
+.tag-radius {
     .tag {
         border-radius: 50px;
-    }
-}
-
-.tagWithText {
-    .info {
-        font-size: 0.8rem;
-        padding-left: 0.4rem;
-        color: #999999;
     }
 }
 </style>

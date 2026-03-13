@@ -129,7 +129,7 @@ const infoSet = reactive({
             flexGrow: 0,
             width: 90,
             minWidth: 90,
-            cellRenderer: ({ cellData, rowData }) => renderTag(cellData, rowData, 'tag', '#f2f3f5', [], 'tagRadius')
+            cellRenderer: ({ cellData, rowData }) => renderTag(cellData, rowData, 'tag', '#f2f3f5', [], 'tag-radius')
         },
         {
             key: 'flow',
